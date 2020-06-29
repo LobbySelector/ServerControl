@@ -1,0 +1,6 @@
+SERVERNAME: "Example"
+REDIS:
+  ADDRES: "127.0.0.1"
+  PORT: 6397
+  AUTH: FALSE
+  PASSWORD: ""

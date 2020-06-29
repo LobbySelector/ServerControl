@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="ServerData:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/ServerData_jar</output-path>
+    <root id="archive" name="ServerData.jar">
+      <element id="module-output" name="ServerData" />
+      <element id="extracted-dir" path="$MAVEN_REPOSITORY$/io/netty/netty-all/5.0.0.Alpha2/netty-all-5.0.0.Alpha2.jar" path-in-jar="/" />
+    </root>
+  </artifact>
+</component>

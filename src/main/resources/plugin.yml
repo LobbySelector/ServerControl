@@ -1,0 +1,4 @@
+name: ServerData
+main: dev.ivex.serverdata.ServerData
+version: 1.0-dev
+author: IveX
