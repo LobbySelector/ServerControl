@@ -9,8 +9,7 @@ public class JedisPublisher {
         Jedis jedis = null;
         try {
             jedis = ServerData.getInstance().getPool().getResource();
-            jedis.auth("kurac2233");
-            jedis.publish("deezer", message);
+            jedis.publish("serverdata", message);
         }
         finally {
             if (jedis != null) {

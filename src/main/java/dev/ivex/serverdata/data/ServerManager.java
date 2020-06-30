@@ -2,12 +2,15 @@ package dev.ivex.serverdata.data;
 
 import dev.ivex.serverdata.ServerData;
 import dev.ivex.serverdata.jedis.JedisPublisher;
+import dev.ivex.serverdata.utilites.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class ServerManager {
@@ -15,15 +18,17 @@ public class ServerManager {
     @Getter public static Map<String, ServerManager> servers = new HashMap<>();
 
     @Getter @Setter
-    private String name, motd;
+    public String name, motd;
     @Getter @Setter
-    private int onlinePlayers, maxPlayers;
+    public int onlinePlayers, maxPlayers;
     @Getter @Setter
-    private long lastUpdate;
+    public long lastUpdate;
     @Getter @Setter
-    private boolean whitelisted;
+    public boolean whitelisted;
     @Getter @Setter
-    private double tps;
+    public double tps;
+    @Getter
+    public long uptime = System.currentTimeMillis();
 
     public ServerManager() {
         this.name = ServerData.getServerName();
@@ -49,17 +54,16 @@ public class ServerManager {
         return servers.values().stream().filter(serverManager -> serverManager.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
 
-    public String getTranslatedStatus() {
-        String status;
-        if (isOnline() && !isWhitelisted()) {
-            status = ChatColor.GREEN + ("Online");
-        } else if (isOnline() && isWhitelisted()) {
-            status = ChatColor.YELLOW + ("Whitelisted");
-        } else if (!isOnline()) {
-            status = ChatColor.RED + ("Offline");
-        } else {
-            status = ChatColor.RED + ("Offline");
-        }
-        return status;
+    public long getUpTime() {
+        return System.currentTimeMillis() - this.uptime;
+    }
+
+    public String getStatus() {
+        String status = "&cOffline";
+
+        if (isOnline()) status = "&aOnline";
+        if (isWhitelisted()) status = "&cWhitelisted";
+
+        return Color.translate(status);
     }
 }
