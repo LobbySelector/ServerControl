@@ -1,19 +1,18 @@
 package dev.ivex.serverdata;
 
-import com.sun.corba.se.spi.activation.Server;
+import dev.ivex.serverdata.commands.RunCmdCommand;
 import dev.ivex.serverdata.commands.ServerDataCommand;
 import dev.ivex.serverdata.data.ServerManager;
 import dev.ivex.serverdata.jedis.JedisPublisher;
 import dev.ivex.serverdata.jedis.JedisSubscriber;
+import dev.ivex.serverdata.utilites.Color;
 import dev.ivex.serverdata.utilites.ConfigFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
 import org.bukkit.plugin.java.JavaPlugin;
-import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPool;
-import sun.security.krb5.Config;
 
 import java.lang.reflect.Field;
 
@@ -24,42 +23,47 @@ public class ServerData extends JavaPlugin {
     @Getter public JedisPool pool;
     @Getter public JedisSubscriber jedisSubscriber;
     @Getter public ServerManager serverManager;
-    @Getter public ConfigFile configFile;
+    @Getter public ConfigFile config;
+    private String address;
+    private int port;
 
     public void onEnable() {
         instance = this;
 
+        config = new ConfigFile(this,"config.yml");
+
         handleRedis();
+        registerServer();
         setupCommandMap();
         registerCommand();
-        registerOther();
-        Bukkit.getScheduler().runTaskLater(ServerData.getInstance(), () -> JedisPublisher.handleWrite("serverdata", "serverstart"), 20L * 3);
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.ONLINE")).replace("%server%", String.valueOf(getServerName())));
     }
 
     public void onDisable() {
-        JedisPublisher.handleWrite("serverdata", "serverstop");
-        jedisSubscriber.getJedisPubSub().unsubscribe();
-        pool.destroy();
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.OFFLINE")).replace("%server%", String.valueOf(ServerData.getServerName())));
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "remove;" + ServerData.getServerName());
+        jedisSubscriber.getJedis().close();
     }
 
     public static String getServerName() {
-        return "Dev";
+        return getInstance().getConfig().getString("SERVER_NAME");
     }
 
     public void registerCommand() {
         new ServerDataCommand();
+        new RunCmdCommand();
     }
 
-    public void registerOther() {
-        new ServerManager();
-        new ConfigFile();
+    public void registerServer() {
+        serverManager = new ServerManager();
     }
 
-    public void handleRedis() { ;
-        pool = new JedisPool("127.0.0.1", 6379);
+    public void handleRedis() {
+        address = ServerData.getInstance().getConfig().getString("DATABASE.REDIS.ADRESS");
+        port = ServerData.getInstance().getConfig().getInt("DATABASE.REDIS.PORT");
+        pool = new JedisPool(address, port);
         jedisSubscriber = new JedisSubscriber();
     }
-
 
     public void setupCommandMap(){
         try {

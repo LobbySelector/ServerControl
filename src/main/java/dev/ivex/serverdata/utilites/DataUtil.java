@@ -1,15 +1,15 @@
 package dev.ivex.serverdata.utilites;
 
 import org.apache.commons.lang.time.DurationFormatUtils;
+import org.bukkit.Bukkit;
+import org.bukkit.entity.Player;
 
 import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.GregorianCalendar;
+import java.util.*;
 import java.util.concurrent.TimeUnit;
 
-public class TimeUtil {
+public class DataUtil {
 
     private static SimpleDateFormat FORMAT = new SimpleDateFormat("dd/MM/yyyy h:mma");
     public static long PERMANENT = Long.MAX_VALUE;
@@ -161,5 +161,14 @@ public class TimeUtil {
         } else {
             return seconds + " second" + (seconds == 1 ? "" : "s");
         }
+    }
+
+    public static Collection<?extends String> getOnlinePlayersNames() {
+        Collection names = new HashSet<>();
+
+        for (Player player : Bukkit.getOnlinePlayers())
+            names.add(player.getName());
+
+        return names;
     }
 }

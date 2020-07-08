@@ -1,5 +1,36 @@
-SERVERNAME: "Example"
-DATABASES:
+SERVER_NAME: "Dev"
+DATABASE:
   REDIS:
-    ADRESS: '127.0.0.1'
+    ADRESS: "127.0.0.1"
     PORT: 6379
+    CHANNEL: "serverdata"
+    AUTHENTICATION:
+      ENABLED: false
+      PASSWORD: ""
+MESSAGE:
+  LIST:
+    - ""
+    - "&6Name&7: &f%server%"
+    - "&6Online&7: &f%onlineplayers%&7/&f%maxplayers%"
+    - "&6Motd&7: &f%motd%"
+    - "&6Status&7: &f%status%"
+    - "&6Tps&7: &f%tps%"
+    - "&6Uptime&7: &f%uptime%"
+    - ""
+  INFO:
+    - "&7&m-----------------------"
+    - "&6Server Status"
+    - ""
+    - "&6Name&7: &f%server%"
+    - "&6Online&7: &f%onlineplayers%&7/&f%maxplayers%"
+    - "&6Motd&7: &f%motd%"
+    - "&6Status&7: &f%status%"
+    - "&6Tps&7: &f%tps%"
+    - "&6Uptime&7: &f%uptime%"
+    - "&7&m-----------------------"
+  ONLINE: "&7[&6S&7] &6Server &f%server% &6is now &aOnline"
+  OFFLINE: "&7[&6S&7] &6Server &f%server% &6is now &cOffline"
+  COMMAND: "&aCommand &l'%command%' &ahas been executed on &l%server% &aserver."
+  COMMAND_ALL: "&aCommand &l'%command%' &ahas been executed on all servers."
+  NOPERMISSION: "&cNo Permission."
+  PERMISSION: "serverdata.*"

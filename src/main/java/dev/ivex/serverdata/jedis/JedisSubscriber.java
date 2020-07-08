@@ -6,9 +6,14 @@ import dev.ivex.serverdata.utilites.Color;
 import lombok.Getter;
 
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
+import org.bukkit.command.CommandSender;
 import org.bukkit.permissions.ServerOperator;
 import redis.clients.jedis.Jedis;
 import redis.clients.jedis.JedisPubSub;
+
+import java.util.ArrayList;
+import java.util.List;
 
 @Getter
 public class JedisSubscriber {
@@ -16,51 +21,71 @@ public class JedisSubscriber {
     private JedisPubSub jedisPubSub;
     private Jedis jedis;
 
+    private String address;
+    private int port;
+
     public JedisSubscriber() {
+        address = ServerData.getInstance().getConfig().getString("DATABASE.REDIS.ADRESS");
+        port = ServerData.getInstance().getConfig().getInt("DATABASE.REDIS.PORT");
 
-        jedis = new Jedis("127.0.0.1", 6379);
+        jedis = new Jedis(address, port);
+        if(ServerData.getInstance().getConfig().getBoolean("DATABASE.REDIS.AUTHENTICATION.ENABLED")) {
+            jedis.auth(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.AUTHENTICATION.PASSWORD"));
+        }
 
-        Bukkit.getConsoleSender().sendMessage(Color.translate("&3[ServerData] &aConnection with Redis has been established."));
+        Bukkit.getConsoleSender().sendMessage(Color.translate("&6[ServerData] &aConnection with Redis has been established."));
 
         handleSubscribe();
     }
 
     private void handleSubscribe() {
         jedisPubSub = handlePubSub();
-        new Thread(() -> jedis.subscribe(jedisPubSub, "serverdata")).start();
+        new Thread(() -> jedis.subscribe(jedisPubSub, ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL"))).start();
     }
 
     private JedisPubSub handlePubSub() {
         return new JedisPubSub() {
-            public void onMessage(String channel, String message) {
-                if (channel.equalsIgnoreCase("serverdata")) {
-                    String[] args = message.split(";");
+            public void onMessage(String channel, String channelmessage) {
+                if (channel.equals(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL"))) {
+                    String[] args = channelmessage.split(";");
                     String command = args[0];
 
-                    switch (command) {
-                        case "serverstart":
-                            Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(player -> player.sendMessage(Color.translate("&e[S] &bServer &e&l" + ServerData.getServerName() + " &bis now &aonline.")));
-                            Bukkit.getConsoleSender().sendMessage(Color.translate("&e[S] &bServer &e&l" + ServerData.getServerName() + " &bis now &aonline."));
+                     switch (command) {
+                            case "broadcast":
+                                String message = args[1];
+                                Bukkit.getConsoleSender().sendMessage(Color.translate(message));
+                                Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission(ServerData.getInstance().getConfig().getString("MESSAGE.PERMISSION"))).forEach(player -> player.sendMessage(Color.translate(message)));
                             break;
-                        case "serverstop":
-                            Bukkit.getOnlinePlayers().stream().filter(ServerOperator::isOp).forEach(player -> player.sendMessage(Color.translate("&e[S] &bServer &e&l" + ServerData.getServerName() + " &bis now &cofflinee.")));
-                            Bukkit.getConsoleSender().sendMessage(Color.translate("&e[S] &bServer &e&l" + ServerData.getServerName() + " &bis now &coffline."));
-                            break;
-                        case "dataUpdate":
-                            ServerManager data = ServerManager.getByName(args[1]);
-                            if (data == null) {
-                                ServerManager.getServers().put(args[1], data = new ServerManager());
+                            case "dataUpdate":
+                                ServerManager data = ServerData.getInstance().getServerManager().getByName(args[1]);
+                                if (data == null) {
+                                    data = new ServerManager();
+                                    ServerData.getInstance().getServerManager().addServer(args[1], data);
+                                }
+
+                                data.setName(args[1]);
+                                data.setLastUpdate(System.currentTimeMillis());
+                                data.setMotd(args[2]);
+                                data.setOnlinePlayers(Integer.parseInt(args[3]));
+                                data.setMaxPlayers(Integer.parseInt(args[4]));
+                                data.setTps(Double.parseDouble(args[5]));
+                                data.setWhitelisted(Boolean.parseBoolean(args[6]));
+                                break;
+                            case "remove":
+                                ServerManager.getServers().remove(args[1]);
+                                break;
+                            case "command": {
+                                if (args[1].equalsIgnoreCase("all")) {
+                                    Bukkit.dispatchCommand((CommandSender) Bukkit.getConsoleSender(), args[2]);
+                                    return;
+                                }
+                                if (ServerData.getServerName().equalsIgnoreCase(args[1])) {
+                                    Bukkit.dispatchCommand((CommandSender) Bukkit.getConsoleSender(), args[2]);
+                                    return;
+                                }
                             }
-                            data.setLastUpdate(System.currentTimeMillis());
-                            data.setMotd(args[2]);
-                            data.setOnlinePlayers(Integer.parseInt(args[3]));
-                            data.setMaxPlayers(Integer.parseInt(args[4]));
-                            data.setTps(Double.parseDouble(args[5]));
-                            data.setWhitelisted(Boolean.parseBoolean(args[6]));
                             break;
-                        case "dataRemove":
-                            ServerManager.getServers().remove(args[2]);
-                    }
+                        }
                 }
             }
         };

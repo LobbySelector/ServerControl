@@ -6,7 +6,8 @@ import dev.ivex.serverdata.utilites.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.ChatColor;
+import org.bukkit.Server;
+import redis.clients.jedis.Jedis;
 
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -33,9 +34,9 @@ public class ServerManager {
     public ServerManager() {
         this.name = ServerData.getServerName();
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(ServerData.getInstance(), () -> {
+        Bukkit.getScheduler().scheduleSyncRepeatingTask(ServerData.getInstance(), () -> {
             JedisPublisher.handleWrite(
-                    "serverdata",
+                    ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";",
                     "dataUpdate;"
                             + this.name + ";"
                             + Bukkit.getServer().getMotd() + ";"
@@ -47,11 +48,17 @@ public class ServerManager {
     }
 
     public boolean isOnline() {
-        return System.currentTimeMillis() - this.lastUpdate < 20000L;
+        return System.currentTimeMillis() - lastUpdate < 10000L;
+    }
+
+    public List<ServerManager> getAllServersData() {
+        return new ArrayList<>(servers.values());
     }
 
     public static ServerManager getByName(String name) {
-        return servers.values().stream().filter(serverManager -> serverManager.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
+        return servers.values().stream().filter((data) -> {
+            return data != null && data.getName().equalsIgnoreCase(name);
+        }).findFirst().orElse(null);
     }
 
     public long getUpTime() {
@@ -66,4 +73,13 @@ public class ServerManager {
 
         return Color.translate(status);
     }
+
+    public void addServer(String name, ServerManager server) {
+        servers.put(name, server);
+    }
+
+    public void removeServer(String name) {
+        servers.remove(name);
+    }
+
 }
