@@ -55,12 +55,9 @@ public class ServerManager {
         return new ArrayList<>(servers.values());
     }
 
-    public static ServerManager getByName(String name) {
-        return servers.values().stream().filter((data) -> {
-            return data != null && data.getName().equalsIgnoreCase(name);
-        }).findFirst().orElse(null);
+    public ServerManager getByName(String name) {
+        return getAllServersData().stream().filter(server -> server.getName().equalsIgnoreCase(name)).findFirst().orElse(null);
     }
-
     public long getUpTime() {
         return System.currentTimeMillis() - this.uptime;
     }

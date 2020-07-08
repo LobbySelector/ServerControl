@@ -46,7 +46,7 @@ public class JedisSubscriber {
     private JedisPubSub handlePubSub() {
         return new JedisPubSub() {
             public void onMessage(String channel, String channelmessage) {
-                if (channel.equals(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL"))) {
+                if (channel.equalsIgnoreCase(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL"))) {
                     String[] args = channelmessage.split(";");
                     String command = args[0];
 
@@ -57,7 +57,7 @@ public class JedisSubscriber {
                                 Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission(ServerData.getInstance().getConfig().getString("MESSAGE.PERMISSION"))).forEach(player -> player.sendMessage(Color.translate(message)));
                             break;
                             case "dataUpdate":
-                                ServerManager data = ServerData.getInstance().getServerManager().getByName(args[1]);
+                                ServerManager data = ServerManager.getByName(args[1]);
                                 if (data == null) {
                                     data = new ServerManager();
                                     ServerData.getInstance().getServerManager().addServer(args[1], data);
@@ -72,7 +72,7 @@ public class JedisSubscriber {
                                 data.setWhitelisted(Boolean.parseBoolean(args[6]));
                                 break;
                             case "remove":
-                                ServerManager.getServers().remove(args[1]);
+                                ServerData.getInstance().getServerManager().removeServer(args[1]);
                                 break;
                             case "command": {
                                 if (args[1].equalsIgnoreCase("all")) {
