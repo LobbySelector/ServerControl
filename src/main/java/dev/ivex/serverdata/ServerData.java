@@ -24,8 +24,8 @@ public class ServerData extends JavaPlugin {
     @Getter public JedisSubscriber jedisSubscriber;
     @Getter public ServerManager serverManager;
     @Getter public ConfigFile config;
-    private String address;
-    private int port;
+    public String address;
+    public int port;
 
     public void onEnable() {
         instance = this;
@@ -40,9 +40,7 @@ public class ServerData extends JavaPlugin {
     }
 
     public void onDisable() {
-        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.OFFLINE")).replace("%server%", String.valueOf(ServerData.getServerName())));
-        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "remove;" + ServerData.getServerName());
-        jedisSubscriber.getJedis().close();
+        serverManager.onClose();
     }
 
     public static String getServerName() {

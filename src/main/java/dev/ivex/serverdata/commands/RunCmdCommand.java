@@ -4,20 +4,15 @@ import dev.ivex.serverdata.ServerData;
 import dev.ivex.serverdata.data.ServerManager;
 import dev.ivex.serverdata.jedis.JedisPublisher;
 import dev.ivex.serverdata.utilites.Color;
-import org.apache.commons.lang.StringUtils;
 import org.bukkit.command.CommandSender;
 import org.bukkit.command.defaults.BukkitCommand;
-import org.bukkit.entity.Player;
-
-import java.util.Arrays;
-
 public class RunCmdCommand extends BukkitCommand {
 
 
     public RunCmdCommand() {
         super("runcmd");
 
-        ServerData.getInstance().getCommandMap().register("runcmd", this);
+        ServerData.getCommandMap().register("runcmd", this);
     }
 
     @Override
@@ -41,7 +36,7 @@ public class RunCmdCommand extends BukkitCommand {
             ServerManager data = ServerData.getInstance().getServerManager().getByName(args[0]);
 
             if (data == null) {
-                sender.sendMessage(Color.translate("&cThat server does cannot be found in our database."));
+                sender.sendMessage(Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.NO_DATA")));
                 return false;
             }
             StringBuilder command = new StringBuilder();

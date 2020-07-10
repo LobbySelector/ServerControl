@@ -51,13 +51,16 @@ public class JedisSubscriber {
                     String command = args[0];
 
                      switch (command) {
+                         case "remove":
+                             ServerData.getInstance().getServerManager().removeServer(args[1]);
+                             break;
                             case "broadcast":
                                 String message = args[1];
                                 Bukkit.getConsoleSender().sendMessage(Color.translate(message));
                                 Bukkit.getOnlinePlayers().stream().filter(player -> player.hasPermission(ServerData.getInstance().getConfig().getString("MESSAGE.PERMISSION"))).forEach(player -> player.sendMessage(Color.translate(message)));
                             break;
                             case "dataUpdate":
-                                ServerManager data = ServerManager.getByName(args[1]);
+                                ServerManager data = ServerData.getInstance().getServerManager().getByName(args[1]);
                                 if (data == null) {
                                     data = new ServerManager();
                                     ServerData.getInstance().getServerManager().addServer(args[1], data);
@@ -70,9 +73,6 @@ public class JedisSubscriber {
                                 data.setMaxPlayers(Integer.parseInt(args[4]));
                                 data.setTps(Double.parseDouble(args[5]));
                                 data.setWhitelisted(Boolean.parseBoolean(args[6]));
-                                break;
-                            case "remove":
-                                ServerData.getInstance().getServerManager().removeServer(args[1]);
                                 break;
                             case "command": {
                                 if (args[1].equalsIgnoreCase("all")) {

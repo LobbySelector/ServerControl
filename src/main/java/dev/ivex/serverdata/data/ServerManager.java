@@ -6,9 +6,6 @@ import dev.ivex.serverdata.utilites.Color;
 import lombok.Getter;
 import lombok.Setter;
 import org.bukkit.Bukkit;
-import org.bukkit.Server;
-import redis.clients.jedis.Jedis;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -17,6 +14,8 @@ import java.util.Map;
 public class ServerManager {
 
     @Getter public static Map<String, ServerManager> servers = new HashMap<>();
+
+    private final String serverName = ServerData.getInstance().getConfig().getString("SERVER_NAME");
 
     @Getter @Setter
     public String name, motd;
@@ -32,13 +31,12 @@ public class ServerManager {
     public long uptime = System.currentTimeMillis();
 
     public ServerManager() {
-        this.name = ServerData.getServerName();
 
         Bukkit.getScheduler().scheduleSyncRepeatingTask(ServerData.getInstance(), () -> {
             JedisPublisher.handleWrite(
                     ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";",
                     "dataUpdate;"
-                            + this.name + ";"
+                            + ServerData.getServerName() + ";"
                             + Bukkit.getServer().getMotd() + ";"
                             + Bukkit.getOnlinePlayers().size() + ";"
                             + Bukkit.getMaxPlayers() + ";" + Bukkit.spigot().getTPS()[0] + ";" + Bukkit.hasWhitelist());
@@ -76,7 +74,12 @@ public class ServerManager {
     }
 
     public void removeServer(String name) {
-        servers.remove(name);
+        servers.remove(getByName(name).getName());
+    }
+
+    public void onClose() {
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.OFFLINE")).replace("%server%", String.valueOf(ServerData.getServerName())));
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "remove;" + serverName);
     }
 
 }

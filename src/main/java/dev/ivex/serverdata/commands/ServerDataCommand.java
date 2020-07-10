@@ -2,6 +2,7 @@ package dev.ivex.serverdata.commands;
 
 import dev.ivex.serverdata.ServerData;
 import dev.ivex.serverdata.data.ServerManager;
+import dev.ivex.serverdata.jedis.JedisPublisher;
 import dev.ivex.serverdata.utilites.Color;
 import dev.ivex.serverdata.utilites.DataUtil;
 import org.bukkit.command.CommandSender;
@@ -17,7 +18,7 @@ public class ServerDataCommand extends BukkitCommand {
         super("server");
         setAliases(Arrays.asList("serverstats", "serverstatus"));
 
-        ServerData.getInstance().getCommandMap().register("server", this);
+        ServerData.getCommandMap().register("server", this);
     }
 
     @Override
@@ -47,7 +48,7 @@ public class ServerDataCommand extends BukkitCommand {
             ServerManager data = ServerData.getInstance().getServerManager().getByName(args[0]);
 
             if (data == null) {
-                sender.sendMessage(Color.translate("&cThat server does cannot be found in our database."));
+                sender.sendMessage(Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.NO_DATA")));
                 return false;
             }
 

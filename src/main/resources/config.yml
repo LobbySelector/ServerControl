@@ -9,14 +9,12 @@ DATABASE:
       PASSWORD: ""
 MESSAGE:
   LIST:
-    - ""
     - "&6Name&7: &f%server%"
     - "&6Online&7: &f%onlineplayers%&7/&f%maxplayers%"
     - "&6Motd&7: &f%motd%"
     - "&6Status&7: &f%status%"
     - "&6Tps&7: &f%tps%"
     - "&6Uptime&7: &f%uptime%"
-    - ""
   INFO:
     - "&7&m-----------------------"
     - "&6Server Status"
@@ -32,5 +30,6 @@ MESSAGE:
   OFFLINE: "&7[&6S&7] &6Server &f%server% &6is now &cOffline"
   COMMAND: "&aCommand &l'%command%' &ahas been executed on &l%server% &aserver."
   COMMAND_ALL: "&aCommand &l'%command%' &ahas been executed on all servers."
+  NO_DATA: "&cThat server does cannot be found in our database."
   NOPERMISSION: "&cNo Permission."
   PERMISSION: "serverdata.*"
