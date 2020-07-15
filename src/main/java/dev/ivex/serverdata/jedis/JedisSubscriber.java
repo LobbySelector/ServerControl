@@ -33,7 +33,7 @@ public class JedisSubscriber {
             jedis.auth(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.AUTHENTICATION.PASSWORD"));
         }
 
-        Bukkit.getConsoleSender().sendMessage(Color.translate("&6[ServerData] &aConnection with Redis has been established."));
+        Bukkit.getConsoleSender().sendMessage(Color.translate("&6[ServerControl] &aConnection with Redis has been established."));
 
         handleSubscribe();
     }

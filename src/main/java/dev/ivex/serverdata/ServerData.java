@@ -9,6 +9,7 @@ import dev.ivex.serverdata.utilites.Color;
 import dev.ivex.serverdata.utilites.ConfigFile;
 import lombok.Getter;
 import org.bukkit.Bukkit;
+import org.bukkit.Server;
 import org.bukkit.command.CommandMap;
 import org.bukkit.craftbukkit.v1_7_R4.CraftServer;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -36,7 +37,7 @@ public class ServerData extends JavaPlugin {
         registerServer();
         setupCommandMap();
         registerCommand();
-        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.ONLINE")).replace("%server%", String.valueOf(getServerName())));
+        serverManager.onConnect();
     }
 
     public void onDisable() {
@@ -63,6 +64,7 @@ public class ServerData extends JavaPlugin {
         jedisSubscriber = new JedisSubscriber();
     }
 
+
     public void setupCommandMap(){
         try {
             if (Bukkit.getServer() instanceof CraftServer) {
@@ -76,4 +78,5 @@ public class ServerData extends JavaPlugin {
             e.printStackTrace();
         }
     }
+
 }

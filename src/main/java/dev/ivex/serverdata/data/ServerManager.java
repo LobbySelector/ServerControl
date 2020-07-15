@@ -15,7 +15,7 @@ public class ServerManager {
 
     @Getter public static Map<String, ServerManager> servers = new HashMap<>();
 
-    private final String serverName = ServerData.getInstance().getConfig().getString("SERVER_NAME");
+    public String serverName = ServerData.getInstance().getConfig().getString("SERVER_NAME");
 
     @Getter @Setter
     public String name, motd;
@@ -27,7 +27,6 @@ public class ServerManager {
     public boolean whitelisted;
     @Getter @Setter
     public double tps;
-    @Getter
     public long uptime = System.currentTimeMillis();
 
     public ServerManager() {
@@ -43,6 +42,10 @@ public class ServerManager {
 
 
         }, 40L, 20L);
+    }
+
+    public void onConnect() {
+        JedisPublisher.handleWrite(ServerData.getInstance().getConfig().getString("DATABASE.REDIS.CHANNEL") + ";", "broadcast;" + Color.translate(ServerData.getInstance().getConfig().getString("MESSAGE.ONLINE")).replace("%server%", String.valueOf((ServerData.getServerName()))));
     }
 
     public boolean isOnline() {
