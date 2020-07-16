@@ -7,6 +7,12 @@ DATABASE:
     AUTHENTICATION:
       ENABLED: false
       PASSWORD: ""
+DISCORD:
+  WEBHOOK: ""
+  TITLE: "ServerControl"
+  AVATAR: ""
+  ONLINE: "[ServerControl] Server %server% is now online"
+  OFFLINE: "[ServerControl] Server %server% is now offline"
 MESSAGE:
   LIST:
     - "&6Name&7: &f%server%"

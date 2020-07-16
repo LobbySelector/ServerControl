@@ -3,6 +3,7 @@ package dev.ivex.serverdata;
 import dev.ivex.serverdata.commands.RunCmdCommand;
 import dev.ivex.serverdata.commands.ServerDataCommand;
 import dev.ivex.serverdata.data.ServerManager;
+import dev.ivex.serverdata.discord.DiscordManager;
 import dev.ivex.serverdata.jedis.JedisPublisher;
 import dev.ivex.serverdata.jedis.JedisSubscriber;
 import dev.ivex.serverdata.utilites.Color;
@@ -25,6 +26,7 @@ public class ServerData extends JavaPlugin {
     @Getter public JedisSubscriber jedisSubscriber;
     @Getter public ServerManager serverManager;
     @Getter public ConfigFile config;
+    @Getter public DiscordManager discordManager;
     public String address;
     public int port;
 
@@ -38,9 +40,12 @@ public class ServerData extends JavaPlugin {
         setupCommandMap();
         registerCommand();
         serverManager.onConnect();
+        discordManager = new DiscordManager();
+        discordManager.serveronline();
     }
 
     public void onDisable() {
+        discordManager.serveroffline();
         serverManager.onClose();
     }
 
