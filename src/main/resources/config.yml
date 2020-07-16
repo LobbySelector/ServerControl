@@ -8,6 +8,7 @@ DATABASE:
       ENABLED: false
       PASSWORD: ""
 DISCORD:
+  ENABLED: false
   WEBHOOK: ""
   TITLE: "ServerControl"
   AVATAR: ""
