@@ -40,7 +40,7 @@ public class ServerData extends JavaPlugin {
         setupCommandMap();
         registerCommand();
         serverManager.onConnect();
-        if(ServerData.getInstance().getConfig().getBoolean("DATABASE.REDIS.AUTHENTICATION.ENABLED")) {
+        if(ServerData.getInstance().getConfig().getBoolean("DISCORD.ENABLED")) {
             discordManager = new DiscordManager();
             discordManager.serveronline();
         }
@@ -48,7 +48,7 @@ public class ServerData extends JavaPlugin {
 
     public void onDisable() {
         discordManager.serveroffline();
-        if(ServerData.getInstance().getConfig().getBoolean("DATABASE.REDIS.AUTHENTICATION.ENABLED")) {
+        if(ServerData.getInstance().getConfig().getBoolean("DISCORD.ENABLED")) {
             serverManager.onClose();
         }
     }
